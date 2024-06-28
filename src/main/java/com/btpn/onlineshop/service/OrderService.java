@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -84,17 +86,18 @@ public class OrderService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> getOrders() {
+    public ResponseEntity<Map<String, Object>> getOrders(Pageable pageable) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            List<Orders> data = ordersRepository.findAll();
+            Page<Orders> data = ordersRepository.findAll(pageable);
             if (!data.isEmpty()) {
                 List<OrderDTO> allOrders = data.stream()
                         .map(order -> modelMapper.map(order, OrderDTO.class))
                         .collect(Collectors.toList());
 
                 result.put("data", allOrders);
-                result.put("total_data", allOrders.size());
+                result.put("total_data", data.getTotalElements());
+                result.put("total_page", data.getTotalPages());
                 result.put("message ", "Orders Berhasil dibaca");
                 result.put("statusCode", HttpStatus.OK.value());
                 return new ResponseEntity<>(result, HttpStatus.OK);
@@ -112,49 +115,6 @@ public class OrderService {
         }
     }
 
-    // public byte[] getOrderReport(String format) {
-    // JasperReport jasperReport;
-
-    // List<Orders> data = ordersRepository.findAll();
-    // List<OrderDTOReport> allOrders = data.stream()
-    // .map(order -> modelMapper.map(order, OrderDTOReport.class))
-    // .collect(Collectors.toList());
-
-    // try {
-    // jasperReport = (JasperReport)
-    // JRLoader.loadObject(ResourceUtils.getFile("order_report.jasper"));
-    // } catch (FileNotFoundException | JRException e) {
-    // try {
-    // File file = ResourceUtils.getFile("classpath:order_report.jrxml");
-    // jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
-    // JRSaver.saveObject(jasperReport, "order_report.jasper");
-    // } catch (FileNotFoundException | JRException ex) {
-    // throw new RuntimeException(e);
-    // }
-    // }
-
-    // JRBeanCollectionDataSource dataSource = new
-    // JRBeanCollectionDataSource(allOrders);
-    // Map<String, Object> parameters = new HashMap<>();
-    // // parameters.put("title", "Item Report");
-    // JasperPrint jasperPrint = null;
-    // byte[] reportContent;
-
-    // try {
-    // jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
-    // dataSource);
-    // switch (format) {
-    // case "pdf" -> reportContent =
-    // JasperExportManager.exportReportToPdf(jasperPrint);
-    // case "xml" -> reportContent =
-    // JasperExportManager.exportReportToXml(jasperPrint).getBytes();
-    // default -> throw new RuntimeException("Unknown report format");
-    // }
-    // } catch (JRException e) {
-    // throw new RuntimeException(e);
-    // }
-    // return reportContent;
-    // }
     public byte[] getOrderReport(String format) throws JRException, IOException {
 
         // 1. Load the Jasper Report Efficiently
@@ -175,13 +135,18 @@ public class OrderService {
         // 2. Fetch and Map Orders (No Changes Needed)
         List<Orders> data = ordersRepository.findAll();
         List<OrderDTOReport> allOrders = data.stream()
-                .map(order -> modelMapper.map(order, OrderDTOReport.class))
+                .map(order -> {
+                    OrderDTOReport dto = modelMapper.map(order, OrderDTOReport.class);
+                    dto.setCustomerName(order.getCustomers().getCustomerName());
+                    dto.setItemsId(order.getItems().getItemsId());
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
         // 3. Fill and Export the Report
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(allOrders);
         Map<String, Object> parameters = new HashMap<>();
-        // parameters.put("title", "Item Report");
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) { // Auto-closeable
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
@@ -272,3 +237,47 @@ public class OrderService {
         }
     }
 }
+
+// public byte[] getOrderReport(String format) {
+// JasperReport jasperReport;
+
+// List<Orders> data = ordersRepository.findAll();
+// List<OrderDTOReport> allOrders = data.stream()
+// .map(order -> modelMapper.map(order, OrderDTOReport.class))
+// .collect(Collectors.toList());
+
+// try {
+// jasperReport = (JasperReport)
+// JRLoader.loadObject(ResourceUtils.getFile("order_report.jasper"));
+// } catch (FileNotFoundException | JRException e) {
+// try {
+// File file = ResourceUtils.getFile("classpath:order_report.jrxml");
+// jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+// JRSaver.saveObject(jasperReport, "order_report.jasper");
+// } catch (FileNotFoundException | JRException ex) {
+// throw new RuntimeException(e);
+// }
+// }
+
+// JRBeanCollectionDataSource dataSource = new
+// JRBeanCollectionDataSource(allOrders);
+// Map<String, Object> parameters = new HashMap<>();
+// // parameters.put("title", "Item Report");
+// JasperPrint jasperPrint = null;
+// byte[] reportContent;
+
+// try {
+// jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
+// dataSource);
+// switch (format) {
+// case "pdf" -> reportContent =
+// JasperExportManager.exportReportToPdf(jasperPrint);
+// case "xml" -> reportContent =
+// JasperExportManager.exportReportToXml(jasperPrint).getBytes();
+// default -> throw new RuntimeException("Unknown report format");
+// }
+// } catch (JRException e) {
+// throw new RuntimeException(e);
+// }
+// return reportContent;
+// }

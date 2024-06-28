@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -69,17 +71,18 @@ public class ItemService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> getItems() {
+    public ResponseEntity<Map<String, Object>> getItems(Pageable pageable) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            List<Items> data = itemsRepository.findAll();
+            Page<Items> data = itemsRepository.findAll(pageable);
             if (!data.isEmpty()) {
                 List<ItemDTO> allItems = data.stream()
                         .map(item -> modelMapper.map(item, ItemDTO.class))
                         .collect(Collectors.toList());
 
                 result.put("data", allItems);
-                result.put("total_data", allItems.size());
+                result.put("total_data", data.getTotalElements());
+                result.put("total_page", data.getTotalPages());
                 result.put("message ", "Items Berhasil dibaca");
                 result.put("statusCode", HttpStatus.OK.value());
                 return new ResponseEntity<>(result, HttpStatus.OK);
@@ -91,6 +94,29 @@ public class ItemService {
             }
         } catch (Exception e) {
             result.put("message ", "Items Gagal dibaca");
+            result.put("exception ", e.getCause());
+            result.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> getItemById(Integer id) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            Optional<Items> data = itemsRepository.findById(id);
+            if (!data.isEmpty()) {
+                ItemDTO dto = modelMapper.map(data.get(), ItemDTO.class);
+                result.put("data", dto);
+                result.put("message ", "Item ID:" + id + " Berhasil dibaca");
+                result.put("statusCode", HttpStatus.OK.value());
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                result.put("message ", "Item ID:" + id + " Gagal dibaca");
+                result.put("statusCode", HttpStatus.NOT_FOUND.value());
+                return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            result.put("message ", "Item ID:" + id + " Gagal dibaca");
             result.put("exception ", e.getCause());
             result.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,6 +1,7 @@
 package com.btpn.onlineshop.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,11 +10,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.btpn.onlineshop.config.MinioHelper;
 import com.btpn.onlineshop.dto.CustomerDTO;
@@ -57,10 +62,26 @@ public class CustomerService {
     }
 
     @Transactional
-    public ResponseEntity<Map<String, Object>> createCustomer(Customers customer) {
+    public ResponseEntity<Map<String, Object>> createCustomer(MultipartFile gambar, Customers customer) {
         Map<String, Object> result = new HashMap<String, Object>();
+        // Ambil Data Gambar
+        List<String> imageExtensions = null;
+        String extension = null;
+        if (gambar != null) {
+            imageExtensions = Arrays.asList("jpeg", "jpg", "png");
+            extension = FilenameUtils.getExtension(gambar.getOriginalFilename());
+        }
         try {
-            String obj = getRandomObject();
+            String obj;
+            if (imageExtensions != null && extension != null && imageExtensions.contains(extension.toLowerCase())
+                    && gambar != null) {
+                obj = gambar.getOriginalFilename();
+
+                // Upload to bucket
+                minioHelper.uploadFile(obj, gambar);
+            } else {
+                obj = getRandomObject();
+            }
             Customers temp = Customers.builder()
                     .customerName(customer.getCustomerName())
                     .customerAddress(customer.getCustomerAddress())
@@ -93,16 +114,17 @@ public class CustomerService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> getCustomers() {
+    public ResponseEntity<Map<String, Object>> getCustomers(Pageable pageable) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            List<Customers> data = customersRepository.findAll();
+            Page<Customers> data = customersRepository.findAll(pageable);
             if (!data.isEmpty()) {
                 List<CustomerDTO> allCustomers = data.stream()
                         .map(customer -> {
                             CustomerDTO dto = modelMapper.map(customer, CustomerDTO.class);
 
                             String url = minioHelper.getPresignedUrl(customer.getPic(), 3);
+                            // String url = "404 for now";
                             dto.setPic(url);
 
                             return dto;
@@ -110,7 +132,8 @@ public class CustomerService {
                         .collect(Collectors.toList());
 
                 result.put("data", allCustomers);
-                result.put("total_data", allCustomers.size());
+                result.put("total_data", data.getTotalElements());
+                result.put("total_page", data.getTotalPages());
                 result.put("message ", "Customers Berhasil dibaca");
                 result.put("statusCode", HttpStatus.OK.value());
                 return new ResponseEntity<>(result, HttpStatus.OK);
@@ -128,6 +151,29 @@ public class CustomerService {
         }
     }
 
+    public ResponseEntity<Map<String, Object>> getCustomerById(Integer id) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            Optional<Customers> data = customersRepository.findById(id);
+            if (!data.isEmpty()) {
+                CustomerDTO dto = modelMapper.map(data.get(), CustomerDTO.class);
+                result.put("data", dto);
+                result.put("message ", "Customer ID:" + id + " Berhasil dibaca");
+                result.put("statusCode", HttpStatus.OK.value());
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                result.put("message ", "Customer ID:" + id + " Gagal dibaca");
+                result.put("statusCode", HttpStatus.NOT_FOUND.value());
+                return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            result.put("message ", "Customer ID:" + id + " Gagal dibaca");
+            result.put("exception ", e.getCause());
+            result.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Transactional
     public ResponseEntity<Map<String, Object>> updateCustomer(Integer id, Customers customer) {
         Map<String, Object> result = new HashMap<String, Object>();
@@ -139,7 +185,7 @@ public class CustomerService {
                 toup.setCustomerAddress(customer.getCustomerAddress());
                 toup.setCustomerPhone(customer.getCustomerPhone());
                 toup.setIsActive(customer.getIsActive());
-                if (customer.getPic() != null){
+                if (customer.getPic() != null) {
                     toup.setPic(customer.getPic());
                 }
 

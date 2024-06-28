@@ -2,6 +2,9 @@ package com.btpn.onlineshop.controller;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,15 +38,25 @@ public class ItemController {
     }
 
     @GetMapping("/getlist")
-    public ResponseEntity<Map<String, Object>> getListItems() {
+    public ResponseEntity<Map<String, Object>> getListItems(
+            @PageableDefault(page = 0, size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Mengakses Get Items");
-        ResponseEntity<Map<String, Object>> data = itemService.getItems();
+        ResponseEntity<Map<String, Object>> data = itemService.getItems(pageable);
+
+        return data;
+    }
+
+    @GetMapping("/getlist/{id}")
+    public ResponseEntity<Map<String, Object>> getItemById(@PathVariable("id") Integer id) {
+        log.info("Mengakses Get Item ID:" + id);
+        ResponseEntity<Map<String, Object>> data = itemService.getItemById(id);
 
         return data;
     }
 
     @PutMapping("/updateitem/{id}")
-    public ResponseEntity<Map<String, Object>> updateItem(@PathVariable("id") Integer itemId, @RequestBody Items items) {
+    public ResponseEntity<Map<String, Object>> updateItem(@PathVariable("id") Integer itemId,
+            @RequestBody Items items) {
         log.info("Mengakses Update Item");
         ResponseEntity<Map<String, Object>> data = itemService.updateItem(itemId, items);
 

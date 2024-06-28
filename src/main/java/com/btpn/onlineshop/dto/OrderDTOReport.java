@@ -19,6 +19,6 @@ public class OrderDTOReport {
     private BigDecimal totalPrice;
     private Integer quantity;
 
-    private Integer itemId;
-    private Integer customerId;
+    private Integer itemsId;
+    private String customerName;
 }

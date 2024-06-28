@@ -6,6 +6,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,29 +46,30 @@ public class OrderController {
     }
 
     @GetMapping("/getlist")
-    public ResponseEntity<Map<String, Object>> getListOrder() {
-        log.info("Mengakses Get Orders");
-        ResponseEntity<Map<String, Object>> data = orderService.getOrders();
+    public ResponseEntity<Map<String, Object>> getListOrder(
+            @PageableDefault(page = 0, size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
+
+        ResponseEntity<Map<String, Object>> data = orderService.getOrders(pageable);
 
         return data;
     }
 
     // @GetMapping("order-report/{format}")
     // public ResponseEntity<Resource> getOrderReport(@PathVariable String format)
-    //         throws JRException, IOException {
-    //     log.info("Mengakses Get Orders Report");
+    // throws JRException, IOException {
+    // log.info("Mengakses Get Orders Report");
 
-    //     byte[] reportContent = orderService.getOrderReport(format);
+    // byte[] reportContent = orderService.getOrderReport(format);
 
-    //     ByteArrayResource resource = new ByteArrayResource(reportContent);
-    //     return ResponseEntity.ok()
-    //             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-    //             .contentLength(resource.contentLength())
-    //             .header(HttpHeaders.CONTENT_DISPOSITION,
-    //                     ContentDisposition.attachment()
-    //                             .filename("order-report." + format)
-    //                             .build().toString())
-    //             .body(resource);
+    // ByteArrayResource resource = new ByteArrayResource(reportContent);
+    // return ResponseEntity.ok()
+    // .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    // .contentLength(resource.contentLength())
+    // .header(HttpHeaders.CONTENT_DISPOSITION,
+    // ContentDisposition.attachment()
+    // .filename("order-report." + format)
+    // .build().toString())
+    // .body(resource);
     // }
 
     @GetMapping("/order-report/{format}")
