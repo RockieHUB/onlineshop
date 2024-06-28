@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.dto;
+package com.onlineshop.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDTOReport {
-    private Integer orderId;
+public class OrderDTO {
+    private int orderId;
     private String orderCode;
     private Date orderDate;
     private BigDecimal totalPrice;
-    private Integer quantity;
 
-    private Integer itemsId;
-    private String customerName;
+    private ItemDTO items;
+
+    private CustomerDTO customers;
 }

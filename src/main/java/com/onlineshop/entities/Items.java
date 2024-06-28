@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.entities;
+package com.onlineshop.entities;
 
 import java.math.BigDecimal;
 import java.util.Date;

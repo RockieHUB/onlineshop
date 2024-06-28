@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.service;
+package com.onlineshop.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.btpn.onlineshop.dto.ItemDTO;
-import com.btpn.onlineshop.entities.Items;
-import com.btpn.onlineshop.repository.ItemsRepository;
+import com.onlineshop.dto.ItemDTO;
+import com.onlineshop.entities.Items;
+import com.onlineshop.repository.ItemsRepository;
 
 import jakarta.transaction.Transactional;
 // import lombok.extern.slf4j.Slf4j;

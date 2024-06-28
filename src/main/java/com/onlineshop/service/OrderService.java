@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.service;
+package com.onlineshop.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,10 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.btpn.onlineshop.dto.OrderDTO;
-import com.btpn.onlineshop.dto.OrderDTOReport;
-import com.btpn.onlineshop.entities.Orders;
-import com.btpn.onlineshop.repository.OrdersRepository;
+import com.onlineshop.dto.OrderDTO;
+import com.onlineshop.dto.OrderDTOReport;
+import com.onlineshop.entities.Orders;
+import com.onlineshop.repository.OrdersRepository;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;

@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.config;
+package com.onlineshop.config;
 
 
 import org.modelmapper.ModelMapper;

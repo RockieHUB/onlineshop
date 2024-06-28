@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.service;
+package com.onlineshop.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,10 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.btpn.onlineshop.config.MinioHelper;
-import com.btpn.onlineshop.dto.CustomerDTO;
-import com.btpn.onlineshop.entities.Customers;
-import com.btpn.onlineshop.repository.CustomersRepository;
+import com.onlineshop.config.MinioHelper;
+import com.onlineshop.dto.CustomerDTO;
+import com.onlineshop.entities.Customers;
+import com.onlineshop.repository.CustomersRepository;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;

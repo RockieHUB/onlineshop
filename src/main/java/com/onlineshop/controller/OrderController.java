@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.controller;
+package com.onlineshop.controller;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.btpn.onlineshop.entities.Orders;
-import com.btpn.onlineshop.service.OrderService;
+import com.onlineshop.entities.Orders;
+import com.onlineshop.service.OrderService;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;

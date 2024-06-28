@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.controller;
+package com.onlineshop.controller;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.extern.slf4j.Slf4j;
+import com.onlineshop.entities.Items;
+import com.onlineshop.service.ItemService;
 
-import com.btpn.onlineshop.entities.Items;
-import com.btpn.onlineshop.service.ItemService;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController

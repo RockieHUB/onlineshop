@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.dto;
+package com.onlineshop.dto;
 
 import java.math.BigDecimal;
 

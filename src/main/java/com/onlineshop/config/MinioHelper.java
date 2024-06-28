@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.config;
+package com.onlineshop.config;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;

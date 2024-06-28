@@ -1,7 +1,7 @@
-package com.btpn.onlineshop.entities;
+package com.onlineshop.entities;
 
+import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -12,7 +12,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
@@ -24,31 +25,36 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Customers {
+public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int customerId;
+    private int orderId;
 
-    @NotBlank(message = "Nama tidak boleh kosong")
-    private String customerName;
-    @NotBlank(message = "Alamat tidak boleh kosong")
-    private String customerAddress;
-    @NotBlank(message = "Nomor Telepon tidak boleh kosong")
-    private String customerPhone;
-    @NotNull(message = "Status tidak boleh kosong")
-    private Boolean isActive;
+    @NotBlank(message = "OrderCode tidak boleh kosong")
+    private String orderCode;
 
-    @Column(name = "last_order_date")
+    @Column(name = "order_date")
     @Temporal(TemporalType.DATE)
     @LastModifiedDate
-    private Date lastOrderDate;
+    private Date orderDate;
     
-    private String pic;
+    @NotNull(message = "total harus diisi")
+    private BigDecimal totalPrice;
 
-    @OneToMany(mappedBy = "customers")
-    private List<Orders> orderses;
+    @NotNull(message = "QTY harus diisi")
+    private Integer quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "items_id")
+    @NotNull(message = "Item harus diisi")
+    private Items items;
+    
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    @NotNull(message = "Customer harus diisi")
+    private Customers customers;
 }

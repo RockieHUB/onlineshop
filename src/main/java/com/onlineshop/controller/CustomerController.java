@@ -1,4 +1,4 @@
-package com.btpn.onlineshop.controller;
+package com.onlineshop.controller;
 
 import java.util.Map;
 
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.btpn.onlineshop.entities.Customers;
-import com.btpn.onlineshop.service.CustomerService;
+import com.onlineshop.entities.Customers;
+import com.onlineshop.service.CustomerService;
 
 import lombok.extern.slf4j.Slf4j;
 
