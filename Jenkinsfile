@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('SonarQube-jenkins') {
                     sh 'mvn clean install'
                     sh 'mvn clean package verify sonar:sonar'
                     echo 'SonarQube Analysis Completed'
